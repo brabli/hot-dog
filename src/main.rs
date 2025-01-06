@@ -1,9 +1,7 @@
 use dioxus::prelude::*;
 
 const FAVICON: Asset = asset!("/assets/favicon.ico");
-const MAIN_CSS: Asset = asset!("/assets/main.css");
-const HEADER_SVG: Asset = asset!("/assets/header.svg");
-const TAILWIND_CSS: Asset = asset!("/assets/tailwind.css");
+const TAILWIND: Asset = asset!("/assets/tailwind.css");
 
 fn main() {
     dioxus::launch(App);
@@ -12,27 +10,38 @@ fn main() {
 #[component]
 fn App() -> Element {
     rsx! {
+        document::Stylesheet { href: TAILWIND }
         document::Link { rel: "icon", href: FAVICON }
-        document::Link { rel: "stylesheet", href: MAIN_CSS } document::Link { rel: "stylesheet", href: TAILWIND_CSS }
-        Hero {}
+        Title {}
+        DogView {}
 
     }
 }
 
 #[component]
-pub fn Hero() -> Element {
+fn Title() -> Element {
     rsx! {
-        div {
-            id: "hero",
-            img { src: HEADER_SVG, id: "header" }
-            div { id: "links",
-                a { href: "https://dioxuslabs.com/learn/0.6/", "📚 Learn Dioxus" }
-                a { href: "https://dioxuslabs.com/awesome", "🚀 Awesome Dioxus" }
-                a { href: "https://github.com/dioxus-community/", "📡 Community Libraries" }
-                a { href: "https://github.com/DioxusLabs/sdk", "⚙️ Dioxus Development Kit" }
-                a { href: "https://marketplace.visualstudio.com/items?itemName=DioxusLabs.dioxus", "💫 VSCode Extension" }
-                a { href: "https://discord.gg/XgGxMSkvUM", "👋 Community Discord" }
+        div { id: "title",
+            h1 { "HotDog!" }
+        }
+    }
+}
+
+#[component]
+fn DogView() -> Element {
+    let btn_classes = "p-2 border border-black rounded-sm bg-zinc-100 w-full";
+
+    rsx! {
+        div { id: "dogview",
+            img {
+                class: "max-w-sm",
+                src: "https://images.dog.ceo/breeds/pitbull/dog-3981540_1280.jpg",
             }
+        }
+
+        div { id: "buttons", class: "flex justify-between max-w-md p-4 gap-4",
+            button { id: "skip", class: btn_classes, "Skip" }
+            button { id: "save", class: btn_classes, "Save" }
         }
     }
 }
