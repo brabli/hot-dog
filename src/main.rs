@@ -22,7 +22,7 @@ fn App() -> Element {
 fn Title() -> Element {
     rsx! {
         div { id: "title",
-            h1 { "HotDog!" }
+            h1 { "HotDog! 🌭" }
         }
     }
 }
@@ -30,18 +30,21 @@ fn Title() -> Element {
 #[component]
 fn DogView() -> Element {
     let btn_classes = "p-2 border border-black rounded-sm bg-zinc-100 w-full";
+    let skip = move |_evt| {};
+    let save = move |_evt| {};
+    let img_src = use_hook(|| "https://images.dog.ceo/breeds/pitbull/dog-3981540_1280.jpg");
 
     rsx! {
         div { id: "dogview",
             img {
                 class: "max-w-sm",
-                src: "https://images.dog.ceo/breeds/pitbull/dog-3981540_1280.jpg",
+                src: "{img_src}",
             }
         }
 
         div { id: "buttons", class: "flex justify-between max-w-md p-4 gap-4",
-            button { id: "skip", class: btn_classes, "Skip" }
-            button { id: "save", class: btn_classes, "Save" }
+            button { onclick: skip, id: "skip", class: btn_classes, "Skip" }
+            button { onclick: save, id: "save", class: btn_classes, "Save" }
         }
     }
 }
