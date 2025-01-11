@@ -1,7 +1,15 @@
-use dioxus::prelude::*;
+use dioxus::{logger::tracing, prelude::*};
 
 const FAVICON: Asset = asset!("/assets/favicon.ico");
 const TAILWIND: Asset = asset!("/assets/tailwind.css");
+
+#[derive(Clone)]
+struct TitleState(String);
+
+#[derive(serde::Deserialize)]
+struct DogApi {
+    message: String,
+}
 
 fn main() {
     dioxus::launch(App);
@@ -9,6 +17,8 @@ fn main() {
 
 #[component]
 fn App() -> Element {
+    use_context_provider(|| TitleState("DOGGY".to_string()));
+    use_context_provider(|| TitleState("HotDoggy!".to_string()));
     rsx! {
         document::Stylesheet { href: TAILWIND }
         document::Link { rel: "icon", href: FAVICON }
@@ -18,11 +28,14 @@ fn App() -> Element {
     }
 }
 
+// h1 { "HotDog! 🌭" }
+
 #[component]
 fn Title() -> Element {
+    let title = use_context::<TitleState>();
     rsx! {
         div { id: "title",
-            h1 { "HotDog! 🌭" }
+            h1 { "{title.0}" }
         }
     }
 }
@@ -30,9 +43,16 @@ fn Title() -> Element {
 #[component]
 fn DogView() -> Element {
     let btn_classes = "p-2 border border-black rounded-sm bg-zinc-100 w-full";
-    let skip = move |_evt| {};
-    let save = move |_evt| {};
-    let img_src = use_hook(|| "https://images.dog.ceo/breeds/pitbull/dog-3981540_1280.jpg");
+    let mut img_src = use_signal(|| "".to_string());
+    let fetch_new = move |_| async move {
+        let res = reqwest::get("https://dog.ceo/api/breeds/image/random")
+            .await
+            .unwrap()
+            .json::<DogApi>()
+            .await
+            .unwrap();
+        img_src.set(res.message);
+    };
 
     rsx! {
         div { id: "dogview",
@@ -43,8 +63,8 @@ fn DogView() -> Element {
         }
 
         div { id: "buttons", class: "flex justify-between max-w-md p-4 gap-4",
-            button { onclick: skip, id: "skip", class: btn_classes, "Skip" }
-            button { onclick: save, id: "save", class: btn_classes, "Save" }
+            button { onclick: fetch_new, id: "skip", class: btn_classes, "Skip" }
+            button { id: "save", class: btn_classes, "Save" }
         }
     }
 }
